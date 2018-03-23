@@ -8,11 +8,15 @@ pieces([P1, P2]) :- piece1(P1), piece2(P2).
 %  all pieces cannot be placed on the board
 
 solve([],B,B,_).
-solve([P|T],B,B3,(W,H)) :- member(X,[0,1,2,3,4]),
-                           member(Y,[0,1,2,3,4]),
+solve([P|T],B,B3,(W,H)) :- numlist(0,W,Xlist),
+                           numlist(0,H,Ylist),
+                           member(X,Xlist),
+                           member(Y,Ylist),
                            translate(X,Y,P,PieceT),
+                           inBounds(W,H,PieceT),
                            place(B,PieceT,B2),
-                           solve(T,B2,B3,(W,H)).
+                           solve(T, B2, B3, (W,H)).
+
 
 translate(_,_,[],[]).
 translate(X,Y,[(A,PX,PY)|T], [(A,PX2,PY2)|T2]) :- PX2 is PX + X,
@@ -31,6 +35,9 @@ fits(B,[H|T]) :- notOnBoard(B,H), fits(B,T).
 
 notOnBoard([],_).
 notOnBoard([(_,BX,BY)|T], (P,PX,PY)) :- (BX \= PX ; BY \= PY), notOnBoard(T,(P,PX,PY)).
+
+
+
 
 makeList(0,[0]).
 makeList(M,[Q|L]) :- Q is M - 1, N is M - 2, makeList(N, L).
