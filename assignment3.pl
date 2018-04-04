@@ -4,8 +4,19 @@ piece1([('A',0,0), ('A',1,0)]).
 piece2([('B',0,0), ('B',1,0)]).
 pieces([P1, P2]) :- piece1(P1), piece2(P2).
 
-% solve will take in a list of pieces and return a board where
-%  all pieces cannot be placed on the board
+
+main(Filename) :-
+    open(Filename, read, Str),
+    read(Str,W),
+    read(Str,H),
+    read(Str,S),
+    alphabet(A),
+    getPieces(Str,S,A,P),
+    close(Str),
+    solve(P,[],B,(W,H)),
+    makeBoard(W,H,Empty),
+    createBoard(Empty,Full,B),
+    printBoard(Full), !.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,7 +33,7 @@ solve([P|T],B,B3,(W,H)) :- numlist(0,W,Xlist),
                            translate(X,Y,P1,PieceT),
                            inBounds(W,H,PieceT),
                            place(B,PieceT,B2),
-                           solve(T, B2, B3, (W,H)).
+                           solve(T, B2, B3, (W,H)), !.
 
 
 translate(_,_,[],[]).
@@ -41,7 +52,8 @@ fits(_,[]).
 fits(B,[H|T]) :- notOnBoard(B,H), fits(B,T).
 
 notOnBoard([],_).
-notOnBoard([(_,BX,BY)|T], (P,PX,PY)) :- (BX \= PX ; BY \= PY), notOnBoard(T,(P,PX,PY)).
+notOnBoard([(_,BX,BY)|T], (P,PX,PY)) :- (BX \= PX ; BY \= PY),
+                                         notOnBoard(T,(P,PX,PY)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PIECE MANIPULATION
@@ -55,22 +67,24 @@ flip((A, X1, Y1), (A, X1, Y2)) :- Y2 is ((-Y1) + 1).
 
 pieceCollection(P, [P,PR,PRR,PRRR,
                     PF,PFR,PFRR,PFRRR]) :- rotatePiece(P,PR),
-                                        rotatePiece(PR,PRR),
-                                        rotatePiece(PRR,PRRR),
-                                        flipPiece(P,PF),
-                                        flipPiece(PR,PFR),
-                                        flipPiece(PRR,PFRR),
-                                        flipPiece(PRRR,PFRRR).
+                                            rotatePiece(PR,PRR),
+                                            rotatePiece(PRR,PRRR),
+                                            flipPiece(P,PF),
+                                            flipPiece(PR,PFR),
+                                            flipPiece(PRR,PFRR),
+                                            flipPiece(PRRR,PFRRR).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % INPUT / OUTPUT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-makeBoard(_,0,[]).
+makeBoard(_,0,[]) :- !.
 makeBoard(N,M,[B|T]) :- makeString('#', N, B), M1 is M - 1, makeBoard(N, M1, T).
 
 makeString(_,0,[]).
 makeString(C,N,[C|T]) :- N1 is N - 1, makeString(C,N1,T).
+
+
 
 printBoard([]).
 printBoard([R|C]) :- printRow(R), printBoard(C).
@@ -78,8 +92,24 @@ printBoard([R|C]) :- printRow(R), printBoard(C).
 printRow([]) :- write('\n').
 printRow([C|R]) :- write(C), printRow(R).
 
+
+
 replaceInBoard(A,0,R,[H|T],[N|T]) :- replaceInRow(A,R,H,N).
 replaceInBoard(A,C,R,[H|T],[H|N]) :- C1 is C - 1, replaceInBoard(A,C1,R,T,N).
 
 replaceInRow(C,0,[_|T], [C|T]).
 replaceInRow(C,N,[H|T], [H|R]) :- M is N - 1, replaceInRow(C, M, T, R).
+
+
+createBoard(B1,B1,[]) :- !.
+createBoard(B1,B3,[(A,X,Y)|T]) :- replaceInBoard(A,X,Y,B1,B2), createBoard(B2,B3,T).
+
+getPieces(_,0,_,[]).
+getPieces(Str,N,[A|As],[H|T]) :- read(Str, Size), getPiece(Str,Size,A,H),
+                          M is N - 1, getPieces(Str,M,As,T).
+
+getPiece(_,0,_,[]).
+getPiece(Str,N,C,[(C,X,Y)|T]) :- read(Str,X), read(Str,Y), M is N - 1, getPiece(Str,M,C,T).
+
+alphabet(['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
+          'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']).
