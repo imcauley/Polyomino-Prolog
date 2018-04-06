@@ -1,9 +1,12 @@
-boardSize(3,4).
-board([]).
-piece1([('A',0,0), ('A',1,0)]).
-piece2([('B',0,0), ('B',1,0)]).
-pieces([P1, P2]) :- piece1(P1), piece2(P2).
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Prolog Polyomino Solver
+% Isaac McAuley
+% For Charlie Hepler
+% COMP 3649
+% Assignment 3
+%
+% Last Edited: April 6, 2018
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 main(Filename) :-
     open(Filename, read, Str),
