@@ -13,10 +13,12 @@ main(Filename) :-
     alphabet(A),
     getPieces(Str,S,A,P),
     close(Str),
-    solve(P,[],B,(W,H)),
-    makeBoard(W,H,Empty),
-    createBoard(Empty,Full,B),
-    printBoard(Full), !.
+    (solve(P,[],B,(W,H)) -> makeBoard(H,W,Empty),
+                            createBoard(Empty,Full,B),
+                            printBoard(Full)
+
+                            ; write('No solution')),
+    !.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
